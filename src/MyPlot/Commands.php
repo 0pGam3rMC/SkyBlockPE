@@ -11,6 +11,7 @@ use MyPlot\subcommand\GenerateSubCommand;
 use MyPlot\subcommand\HelpSubCommand;
 use MyPlot\subcommand\HomeSubCommand;
 use MyPlot\subcommand\InfoSubCommand;
+use MyPlot\subcommand\CommandsSubCommand;
 use MyPlot\subcommand\MiddleSubCommand;
 use MyPlot\subcommand\NameSubCommand;
 use MyPlot\subcommand\RemoveHelperSubCommand;
@@ -58,8 +59,10 @@ class Commands extends PluginCommand{
 		$this->loadSubCommand(new UnDenySubCommand($plugin, "undenyplayer"));//untrust
 		$this->loadSubCommand(new SetOwnerSubCommand($plugin, "setowner"));
 		$this->loadSubCommand(new ClaimSubCommand($plugin, "claim"));
-		// level, challenges, top, limits, togglewarp, sethome, setwarp
-		$this->plugin->getLogger()->debug("Commands Registered to MyPlot");
+
+		$this->loadSubCommand(new CommandsSubCommand($plugin, "commands"));
+		// level, challenges, top, limits, togglewarp, sethome, setwarp, menu
+		$this->plugin->getLogger()->debug("Commands Registered to SkyBlock");
 	}
 
 	/**

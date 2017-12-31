@@ -10,6 +10,7 @@ authors:
  - jasonwynn10
  - XenialDan
 description: "SkyBlock recoded for MCPE based on MyPlot"
+prefix: §bSky§aBlock§r
 load: STARTUP
 softdepend:
 - EconomyAPI

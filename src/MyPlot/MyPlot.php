@@ -23,13 +23,23 @@ use pocketmine\level\generator\biome\Biome;
 use pocketmine\level\generator\Generator;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
+use pocketmine\network\mcpe\protocol\PacketPool;
 use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\TextFormat;
 use pocketmine\utils\TextFormat as TF;
 use PocketMoney\PocketMoney;
+use xenialdan\customui\API as UIAPI;
+use xenialdan\customui\elements\Button;
+use xenialdan\customui\network\ModalFormRequestPacket;
+use xenialdan\customui\network\ModalFormResponsePacket;
+use xenialdan\customui\network\ServerSettingsRequestPacket;
+use xenialdan\customui\network\ServerSettingsResponsePacket;
+use xenialdan\customui\windows\SimpleForm;
 
 class MyPlot extends PluginBase{
+	public static $uis = [];
 
 	/** @var PlotLevelSettings[] $levels */
 	private $levels = [];
@@ -502,7 +512,31 @@ class MyPlot extends PluginBase{
 			$eventListener->onLevelLoad(new LevelLoadEvent($level));
 		}
 		$this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
+
+		PacketPool::registerPacket(new ModalFormRequestPacket());
+		PacketPool::registerPacket(new ModalFormResponsePacket());
+		PacketPool::registerPacket(new ServerSettingsRequestPacket());
+		PacketPool::registerPacket(new ServerSettingsResponsePacket());
+		/** call this AFTER registering packets! */
+		$this->registerUIs();
 		$this->getLogger()->notice(TF::GREEN . "Enabled!");
+	}
+
+	private function registerUIs(){
+		$ui = new SimpleForm($this->getDescription()->getPrefix() . TextFormat::DARK_PURPLE . ' Commands', 'These are all ' . $this->getDescription()->getPrefix() . ' commands:');
+
+		$namespace = $this->getDescription()->getName() . '\subcommand\\';
+		foreach (\get_declared_classes() as $class){
+			if (strpos($class, $namespace) === 0){
+				$c = substr($class, strlen($namespace));
+				$c = str_replace('SubCommand', '', $c);
+				if (strlen($c) > 0){
+					$ui->addButton(new Button(TextFormat::DARK_GREEN . $c));
+				}
+			}
+		}
+		self::$uis['commands'] = UIAPI::addUI($this, $ui);
+		/* ********* */
 	}
 
 	public function addLevelSettings(string $levelName, PlotLevelSettings $settings): bool{
